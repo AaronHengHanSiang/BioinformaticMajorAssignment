@@ -1,0 +1,41 @@
+wget -c https://universityofadelaide.box.com/shared/static/xirxxepsce0ls5x4k7hc386pagqaer8c.gz -O "majorProjectRawData.tar.gz"
+wget ftp://ftp.ensemblgenomes.org/pub/release-37/plants/gtf/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.37.gtf.gz
+
+#unzip all necessary data
+gunzip majorProjectRawData.tar.gz
+gunzip Arabidopsis_thaliana.TAIR10.37.gtf.gz 
+gunzip Col_SRR3207067.fastq.gz 
+gunzip Col_SRR3207068.fastq.gz 
+gunzip Col_SRR3207069.fastq.gz 
+gunzip hda5-1_SRR3207073.fastq.gz 
+gunzip hda5-1_SRR3207074.fastq.gz
+gunzip hda5-1_SRR3207075.fastq.gz  
+
+mkdir -p ~/MajorProjectFastq/fastqc
+fastqc -o ~/MajorProjectFastq/fastqc/ -t 3 Col_SRR3207067.fastq Col_SRR3207068.fastq Col_SRR3207069.fastq 
+fastqc -o ~/MajorProjectFastq/fastqc/ -t 3 hda5-1_SRR3207073.fastq hda5-1_SRR3207074.fastq hda5-1_SRR3207075.fastq 
+
+gunzip Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz #reference genome
+bwa index TAIR10 Arabidopsis_thaliana.dna.toplevel.fa #make an index 
+
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/Col_SRR3207067.trimmed.fastq Col_SRR3207067.fastq 
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/Col_SRR3207068.trimmed.fastq Col_SRR3207068.fastq 
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/Col_SRR3207069.trimmed.fastq Col_SRR3207069.fastq 
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/hda5-1_SRR3207073.trimmed.fastq hda5-1_SRR3207073.fastq 
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/hda5-1_SRR3207074.trimmed.fastq hda5-1_SRR3207074.fastq  
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -o ~/MajorProjectFastq/trimmedFastqc/hda5-1_SRR3207075.trimmed.fastq hda5-1_SRR3207075.fastq
+
+#align the fastq to the index
+bwa mem TAIR10 hda5-1_SRR3207073.trimmed.fastq | samtools view -bhS -> hda5-1_SRR3207073.fastq.bam
+bwa mem TAIR10 hda5-1_SRR3207074.trimmed.fastq | samtools view -bhS -> hda5-1_SRR3207074.fastq.bam
+bwa mem TAIR10 hda5-1_SRR3207075.trimmed.fastq | samtools view -bhS -> hda5-1_SRR3207075.fastq.bam
+bwa mem TAIR10 Col_SRR3207067.trimmed.fastq | samtools view -bhS -> Col_SRR3207067.fastq.bam
+bwa mem TAIR10 Col_SRR3207068.trimmed.fastq | samtools view -bhS -> Col_SRR3207068.fastq.bam
+bwa mem TAIR10 Col_SRR3207069.trimmed.fastq | samtools view -bhS -> Col_SRR3207069.fastq.bam
+
+#count the number of alignments
+mkdir counts #create output folder for counts
+touch countAlignments.sh #create new script to count alignments
+nano countAlignments.sh #countAlignments.sh script can be found at https://github.com/AaronHengHanSiang/BioinformaticMajorAssignment/commit/78050666b446874ccbd53beaaf727ae10b29cb96
+chmod +x countAlignments.sh
+./countAlignments.sh
