@@ -36,6 +36,6 @@ bwa mem TAIR10 Col_SRR3207069.trimmed.fastq | samtools view -bhS -> Col_SRR32070
 #count the number of alignments
 mkdir counts #create output folder for counts
 touch countAlignments.sh #create new script to count alignments
-nano countAlignments.sh #countAlignments.sh script can be found at https://github.com/AaronHengHanSiang/BioinformaticMajorAssignment/commit/78050666b446874ccbd53beaaf727ae10b29cb96
+nano countAlignments.sh #countAlignments.sh script can be found at https://github.com/AaronHengHanSiang/BioinformaticMajorAssignment/blob/master/countAlignment.sh
 chmod +x countAlignments.sh
 ./countAlignments.sh
